@@ -52,21 +52,27 @@ int main() {
   keypad(stdscr, TRUE);
   timeout(1);
 
-  w = draw_screen();
+  w = create_screen(); // ja tem a medida
+
+  init_world(&world, w.ws_col, w.ws_row);
+  
+  draw_screen(w, world);
+  
   init_player(&player, w.ws_col, w.ws_row);
-  init_world(&world, 10, 10);
+
   
   pthread_create (&thread_id, NULL, input_control, player);  
 
   
   while (1) {
     usleep(100000);
-    print_player(player);
-    move_player(player);
 
-    if (check_outside(player, w)) {
+    move_player(player, world);
+    print_player(player);
+    if (!is_alive(player, world)) {
       break;
     }
+    
   }
   endwin();
   return 0;

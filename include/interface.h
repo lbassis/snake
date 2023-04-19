@@ -1,2 +1,2 @@
-struct winsize draw_screen(void);
-void draw_game_over(void);
+struct winsize create_screen(void);
+void draw_screen(struct winsize w, void *world);
