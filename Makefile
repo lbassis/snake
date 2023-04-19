@@ -18,6 +18,7 @@ all: $(OBJ)
 	@echo Game compiled!
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(DEPS)
+	@mkdir -p $(OBJDIR) $(BINDIR)
 	$(CC) -c -o $@ $< $(CFLAGS) $(LDFLAGS)
 
 clean:
