@@ -8,8 +8,8 @@ BINDIR=./bin
 CFLAGS=-I$(IDIR) -Wall -g
 LDFLAGS=-lncurses -lpthread
 
-DEPS=include/player.h include/interface.h
-OBJ=$(OBJDIR)/main.o $(OBJDIR)/interface.o $(OBJDIR)/player.o
+DEPS=include/player.h include/interface.h include/world.h
+OBJ=$(OBJDIR)/main.o $(OBJDIR)/interface.o $(OBJDIR)/player.o $(OBJDIR)/world.o
 
 TARGET=$(BINDIR)/game
 

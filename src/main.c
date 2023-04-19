@@ -7,6 +7,8 @@
 
 #include <interface.h>
 #include <player.h>
+#include <world.h>
+
 
 void *input_control(void *player)
 {
@@ -38,6 +40,7 @@ void *input_control(void *player)
 int main() {
 
   void *player = NULL;
+  void *world = NULL;
   pthread_t thread_id;
   struct winsize w;
   
@@ -51,6 +54,7 @@ int main() {
 
   w = draw_screen();
   init_player(&player, w.ws_col, w.ws_row);
+  init_world(&world, 10, 10);
   
   pthread_create (&thread_id, NULL, input_control, player);  
 
