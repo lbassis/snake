@@ -26,7 +26,7 @@ void init_world(void **world, int width, int height) {
     {
         for (int j=0; j<height; j++)
         {
-            b->world[i][j] = 0;    
+            b->world[i][j] = 0;
         }
     }
 
