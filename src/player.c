@@ -76,10 +76,7 @@ int turn_to_direction(void *player, enum Turn t)
     d = (p->direction + 1) % 4;
     break;
   case LEFT:
-    if (p->direction == 0)
-      d = 3;
-    else
-      d = (p->direction - 1);
+    d = (p->direction - 1) % 4;
     break;
   default:
     break;
