@@ -3,6 +3,7 @@
 #include <curses.h>
 #include <ncurses.h>
 
+#include <world.h>
 #include <player.h>
 
 typedef struct {
@@ -32,9 +33,11 @@ void init_player(void **player, int width, int height) {
   *player = p;
 }
 
-void move_player(void *player) {
+void move_player(void *player, void *world) {
 
   PLAYER_t *p = (PLAYER_t *)player;
+
+  create_enemy(world, p->position_x, p->position_y);
   
   switch (p->direction) {
 
@@ -53,6 +56,7 @@ void move_player(void *player) {
   default:
     break;
   }
+
 }
 
 void print_player(void *player) {
@@ -72,10 +76,12 @@ void change_direction(void *player, enum Direction dir) {
   }
 }
 
-int check_outside(void *player, struct winsize w) {
+int is_alive(void *player, void *world) {
 
   PLAYER_t *p = (PLAYER_t *)player;
-  return (p->position_x < MARGIN_X || p->position_x >= w.ws_col - MARGIN_X ||
-	  p->position_y < MARGIN_Y || p->position_y >= w.ws_row - MARGIN_Y );
+
+  //printf("testando %hu,%hu\n", p->position_x, p->position_y);
+  int rt = check_enemy(world, p->position_x, p->position_y);
+  return !rt;
 }
     
