@@ -67,34 +67,19 @@ int turn_to_direction(void *player, enum Turn t)
   PLAYER_t *p = (PLAYER_t *)player;
   int d;
 
-  if (t == NORMAL)
-    return p->direction;
+  switch (t) {
 
-  switch (p->direction) {
-
-  case NORTH:
-    if(t == RIGHT)
-      d = WEST;
-    else
-      d = EAST;
+  case NORMAL:
+    d = p->direction;
     break;
-  case WEST:
-    if(t == RIGHT)
-      d = SOUTH;
-    else
-      d = NORTH;
+  case RIGHT:
+    d = (p->direction + 1) % 4;
     break;
-  case SOUTH:
-    if(t == RIGHT)
-      d = EAST;
+  case LEFT:
+    if (p->direction == 0)
+      d = 3;
     else
-      d = WEST;
-    break;
-  case EAST:
-    if(t == RIGHT)
-      d = NORTH;
-    else
-      d = SOUTH;
+      d = (p->direction - 1);
     break;
   default:
     break;
@@ -102,7 +87,6 @@ int turn_to_direction(void *player, enum Turn t)
   } 
   return d;
 }
-
 
 
 int look_ahead(void *player, void *world, enum Direction dir)
