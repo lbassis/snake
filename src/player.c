@@ -113,13 +113,13 @@ int look_ahead(void *player, void *world, enum Direction dir)
   switch (dir) {
 
   case NORTH:
-    r = check_enemy(world, p->position_x, p->position_y + 1);
+    r = check_enemy(world, p->position_x, p->position_y - 1);
     break;
   case WEST:
     r = check_enemy(world, p->position_x + 1, p->position_y);
     break;
   case SOUTH:
-    r = check_enemy(world, p->position_x, p->position_y - 1);
+    r = check_enemy(world, p->position_x, p->position_y + 1);
     break;
   case EAST:
     r = check_enemy(world, p->position_x - 1, p->position_y);
@@ -127,7 +127,6 @@ int look_ahead(void *player, void *world, enum Direction dir)
   default:
     break;
   }
-  print_log(r);
   return r;
 }
 
@@ -135,16 +134,22 @@ void input_control_enemy(void * player, void * world)
 {
   int r, t;
   
-  do
-  {
-    r = rand() % 100;
-    if (r >= 0 && r < 90)
-      t = NORMAL;
-    if (r >= 90 && r < 95)
-      t = RIGHT;
-    if (r >= 95 && r < 100)
-      t = LEFT;
-  } while (look_ahead (player, world, turn_to_direction(player, t)));
+  if ((look_ahead (player, world, turn_to_direction(player, NORMAL)))
+      && (look_ahead (player, world, turn_to_direction(player, RIGHT)))
+      && (look_ahead (player, world, turn_to_direction(player, LEFT))))
+    t = NORMAL;
+  else
+    do
+    {
+      r = rand() % 100;
+      if (r >= 0 && r < 90)
+        t = NORMAL;
+      if (r >= 90 && r < 95)
+        t = RIGHT;
+      if (r >= 95 && r < 100)
+        t = LEFT;
+      print_log(t);
+    } while (look_ahead (player, world, turn_to_direction(player, t)));
 
   change_direction(player, turn_to_direction(player, t));
 }

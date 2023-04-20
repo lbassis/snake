@@ -77,7 +77,7 @@ int main() {
     move_player(enemy, world);
     print_player(enemy);
 
-    if (!is_alive(player, world)) {
+    if (!is_alive(player, world) || !is_alive(enemy, world)) {
       break;
     }
     
