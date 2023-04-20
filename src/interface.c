@@ -15,6 +15,12 @@ struct winsize create_screen(void) {
   return w;
 }
 
+void print_log(char s)
+{
+  mvaddch(1, 1, s);
+}
+
+
 void draw_screen(struct winsize w, void *world) {
 
   int i;

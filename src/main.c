@@ -40,10 +40,12 @@ void *input_control(void *player)
 int main() {
 
   void *player = NULL;
+  void *enemy = NULL;
   void *world = NULL;
   pthread_t thread_id;
   struct winsize w;
   
+  srand(time(NULL));
   initscr();
   curs_set(0); /* Hides the cursor */
   clear();
@@ -59,6 +61,7 @@ int main() {
   draw_screen(w, world);
   
   init_player(&player, w.ws_col, w.ws_row);
+  init_player(&enemy, w.ws_col-10, w.ws_row-10);
 
   
   pthread_create (&thread_id, NULL, input_control, player);  
@@ -69,6 +72,11 @@ int main() {
 
     move_player(player, world);
     print_player(player);
+
+    input_control_enemy(enemy, world);
+    move_player(enemy, world);
+    print_player(enemy);
+
     if (!is_alive(player, world)) {
       break;
     }

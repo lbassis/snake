@@ -7,3 +7,9 @@ enum Direction {
   SOUTH,
   EAST
 };
+
+enum Turn {
+  NORMAL,
+  RIGHT,
+  LEFT
+};
