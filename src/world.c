@@ -37,7 +37,6 @@ void init_world(void **world, struct winsize w) {
   }
 
   *world = b;
-  draw_screen(w, *world);
 }
 
 void update_world(void *world) {

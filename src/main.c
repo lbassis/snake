@@ -22,8 +22,14 @@ int main() {
   init_curses();
   
   w = create_screen();
+  init_world(&world, w);
+
+  draw_menu(w, DRAW);
+  while(getch() == ERR);
+  draw_menu(w, CLEAR);
+
+  draw_screen(w, world);
   score_position = draw_score(w);
-  init_world(&world, w);  
   init_player(&player, w.ws_col, w.ws_row);
   create_food(world);
 

@@ -9,6 +9,7 @@
 #include <player.h>
 
 #define GAME_OVER "Game Over!"
+#define PRESS_TO_START "Press any key to start"
 
 void init_curses(void) {
   
@@ -59,6 +60,27 @@ void draw_screen(struct winsize w, void *world) {
   }
 
   attroff(A_BOLD);
+}
+
+void draw_menu(struct winsize w, unsigned short mode) {
+
+  int width = w.ws_col;
+  int height = w.ws_row;
+
+  int center_width = width/2 - strlen(PRESS_TO_START)/2;
+  int center_height = height/2;
+
+  
+  attron(A_BOLD);
+  
+  clear();
+
+  if (mode == DRAW) {
+    mvaddstr(center_height, center_width, PRESS_TO_START);
+  }
+
+  attroff(A_BOLD);
+  
 }
 
 void draw_game_over(struct winsize w) {
