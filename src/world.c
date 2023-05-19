@@ -1,52 +1,64 @@
+#include <unistd.h>
 #include <curses.h>
 #include <ncurses.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <interface.h>
 #include <world.h>
 
 typedef struct {
   unsigned short size_x;
   unsigned short size_y;
-
-  unsigned short **world;
+  int **world;
 } WORLD_t;
 
-void init_world(void **world, int width, int height) {
+void init_world(void **world, struct winsize w) {
 
+  int i, j;
+  int width = w.ws_col;
+  int height = w.ws_row;
   WORLD_t *b = malloc(sizeof(WORLD_t));
 
   b->size_x = width;
   b->size_y = height;
 
-  b->world = (unsigned short**)malloc(sizeof(unsigned short*) * width);
-  for (int i = 0; i < width; i++)
-    b->world[i] = (unsigned short*)malloc(sizeof(unsigned short) * height);
+  b->world = (int**)malloc(sizeof(int*) * width);
 
-  for (int i=0; i<width; i++)
-    {
-      for (int j=0; j<height; j++)
-        {
-            b->world[i][j] = 0;
-        }
+  for (i = 0; i < width; i++) {
+    b->world[i] = (int*)malloc(sizeof(int) * height);
+  }
+
+  for (i = 0; i < width; i++) {
+    for (j = 0; j < height; j++) {
+      b->world[i][j] = EMPTY_CELL;
     }
+  }
 
-  * world = b;
+  *world = b;
+  draw_screen(w, *world);
 }
 
-void create_enemy(void *world, unsigned short x, unsigned short y) {
+void update_world(void *world) {
 
+  int i, j;
   WORLD_t *b = (WORLD_t *)world;
+  int width = b->size_x;
+  int height = b->size_y;
+  
+  for (i = 0; i < width; i++) {
+    for (j = 0; j < height; j++) {
+      
+      if (b->world[i][j] > EMPTY_CELL) {
+	b->world[i][j]--;
 
-  b->world[x][y] = ENEMY;
-}
-
-int check_enemy(void *world, unsigned short x, unsigned short y) {
-
-  WORLD_t *b = (WORLD_t *)world;
-
-  return (b->world[x][y] == ENEMY);
+	if (b->world[i][j] <= (EMPTY_CELL + 1)) {
+	  mvaddch(j, i, ' ');
+	}
+      }
+    }
+  }
 }
 
 void debug_world(void *world) {
@@ -62,5 +74,74 @@ void debug_world(void *world) {
     }
     printf("\n");
   }
+}
 
+void create_obstacle(void *world, unsigned short x, unsigned short y, unsigned short duration) {
+
+  WORLD_t *b = (WORLD_t *)world;
+
+  b->world[x][y] = duration;
+}
+
+int check_obstacle(void *world, unsigned short x, unsigned short y) {
+
+  WORLD_t *b = (WORLD_t *)world;
+
+  if (b->world[x][y] > 0 || b->world[x][y] == BORDER_CELL) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+void create_food(void *world) {
+  
+  WORLD_t *b = (WORLD_t *)world;
+  int width = b->size_x;
+  int height = b->size_y;
+
+  int x = random() % width;
+  int y = random() % height;
+
+  b->world[x][y] = FOOD_CELL;
+  mvaddch(y, x, '*');
+}
+
+void destroy_food(void *world, unsigned short x, unsigned short y) {
+
+  WORLD_t *b = (WORLD_t *)world;
+
+  b->world[x][y] = 0;
+  mvaddch(y, x, ' ');
+}
+
+int check_food(void *world, unsigned short x, unsigned short y) {
+
+  WORLD_t *b = (WORLD_t *)world;
+
+  if (b->world[x][y] == FOOD_CELL) {
+    destroy_food(world, x, y);
+    increase_tail(world);
+    create_food(world);
+
+    return 1;
+  }
+
+  return 0;
+}
+
+void increase_tail(void *world) {
+
+  int i, j;
+  WORLD_t *b = (WORLD_t *)world;
+
+  for (i = 0; i < b->size_x; i++) {
+    for (j = 0; j < b->size_y; j++) {
+      if (b->world[i][j] > EMPTY_CELL) {
+	b->world[i][j]++;
+	mvaddch(j, i, '#');
+      }
+    }
+  }
 }

@@ -3,77 +3,53 @@
 #include <curses.h>
 #include <ncurses.h>
 #include <sys/ioctl.h>
-#include <pthread.h>
 
 #include <interface.h>
 #include <player.h>
 #include <world.h>
 
+#define DELAY 75000
 
-void *input_control(void *player)
-{
-  int ch;
-  
-  while (1) {
-
-    ch = getch();
-
-    switch (ch) {
-    case KEY_UP:
-      change_direction(player, NORTH);
-      break;
-    case KEY_RIGHT:
-      change_direction(player, WEST);
-      break;
-    case KEY_DOWN:
-      change_direction(player, SOUTH);
-      break;
-    case KEY_LEFT:
-      change_direction(player, EAST);
-      break;
-    default:
-      break;
-    }
-  }
-}
+void game_loop(void *player, void *world, int score_position);
 
 int main() {
 
+  int score_position;
   void *player = NULL;
   void *world = NULL;
-  pthread_t thread_id;
   struct winsize w;
-  
-  initscr();
-  curs_set(0); /* Hides the cursor */
-  clear();
-  noecho();
-  cbreak();	/* Line buffering disabled. pass on everything */
-  keypad(stdscr, TRUE);
-  timeout(1);
 
-  w = create_screen(); // ja tem a medida
-
-  init_world(&world, w.ws_col, w.ws_row);
+  init_curses();
   
-  draw_screen(w, world);
-  
+  w = create_screen();
+  score_position = draw_score(w);
+  init_world(&world, w);  
   init_player(&player, w.ws_col, w.ws_row);
+  create_food(world);
 
+  game_loop(player, world, score_position);
+  draw_game_over(w);
   
-  pthread_create (&thread_id, NULL, input_control, player);  
-
-  
-  while (1) {
-    usleep(100000);
-
-    move_player(player, world);
-    print_player(player);
-    if (!is_alive(player, world)) {
-      break;
-    }
-    
-  }
+  while(1);
   endwin();
   return 0;
+}
+
+void game_loop(void *player, void *world, int score_position) {
+
+  while (1) {
+    if (!is_alive(player, world)) {
+      return;
+    }
+    else {
+      eat(player, world);
+    }
+
+    update_world(world);
+    print_player(player);
+    move_player(player, world);
+
+    update_score(player, score_position);
+    usleep(DELAY);
+  }
 }

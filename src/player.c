@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <curses.h>
 #include <ncurses.h>
+#include <pthread.h>
 
 #include <world.h>
 #include <player.h>
@@ -12,8 +13,14 @@ typedef struct {
   unsigned short position_y;
 
   enum Direction direction;
+  pthread_t control_tid;
 } PLAYER_t;
 
+int get_size(void *player) {
+
+  PLAYER_t *p = (PLAYER_t *)player;
+  return p->size;
+}
 
 void debug_player(void *player) {
   
@@ -26,18 +33,46 @@ void init_player(void **player, int width, int height) {
 
   PLAYER_t *p = malloc(sizeof(PLAYER_t));
 
+  p->size = INITIAL_SIZE;
   p->direction = SOUTH;
   p->position_x = (int) width/2 + MARGIN_X;
   p->position_y = (int) height/2 + MARGIN_Y;
 
+  pthread_create(&(p->control_tid), NULL, input_control, p);
   *player = p;
+}
+
+void *input_control(void *player) {
+  int ch;
+  
+  while (1) {
+
+    ch = getch();
+
+    switch (ch) {
+    case KEY_UP:
+      change_direction(player, NORTH);
+      break;
+    case KEY_RIGHT:
+      change_direction(player, WEST);
+      break;
+    case KEY_DOWN:
+      change_direction(player, SOUTH);
+      break;
+    case KEY_LEFT:
+      change_direction(player, EAST);
+      break;
+    default:
+      break;
+    }
+  }
 }
 
 void move_player(void *player, void *world) {
 
   PLAYER_t *p = (PLAYER_t *)player;
 
-  create_enemy(world, p->position_x, p->position_y);
+  create_obstacle(world, p->position_x, p->position_y, p->size);
   
   switch (p->direction) {
 
@@ -56,7 +91,6 @@ void move_player(void *player, void *world) {
   default:
     break;
   }
-
 }
 
 void print_player(void *player) {
@@ -80,8 +114,16 @@ int is_alive(void *player, void *world) {
 
   PLAYER_t *p = (PLAYER_t *)player;
 
-  //printf("testando %hu,%hu\n", p->position_x, p->position_y);
-  int rt = check_enemy(world, p->position_x, p->position_y);
+  int rt = check_obstacle(world, p->position_x, p->position_y);
+  
   return !rt;
 }
     
+void eat(void *player, void *world) {
+
+  PLAYER_t *p = (PLAYER_t *)player;
+
+  if (check_food(world, p->position_x, p->position_y)) {
+    p->size++;
+  }
+}
