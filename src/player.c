@@ -3,6 +3,7 @@
 #include <curses.h>
 #include <ncurses.h>
 #include <pthread.h>
+#include <signal.h>
 
 #include <world.h>
 #include <player.h>
@@ -13,7 +14,8 @@ typedef struct {
   unsigned short position_y;
 
   enum Direction direction;
-  pthread_t control_tid;
+  pthread_t control_thread;
+  int control_tid;
 } PLAYER_t;
 
 int get_size(void *player) {
@@ -37,9 +39,17 @@ void init_player(void **player, int width, int height) {
   p->direction = SOUTH;
   p->position_x = (int) width/2 + MARGIN_X;
   p->position_y = (int) height/2 + MARGIN_Y;
-
-  pthread_create(&(p->control_tid), NULL, input_control, p);
+  p->control_tid = pthread_create(&(p->control_thread), NULL, input_control, p);
+  
   *player = p;
+}
+
+void destroy_player(void **player) {
+
+  PLAYER_t *p = (PLAYER_t*) *player;
+
+  pthread_cancel(p->control_thread);
+  free(p);
 }
 
 void *input_control(void *player) {

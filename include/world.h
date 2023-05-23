@@ -9,6 +9,7 @@
 #define BORDER_CELL -3
 
 void init_world(void **world, struct winsize w);
+void destroy_world(void **world);
 void create_obstacle(void *world, unsigned short x, unsigned short y, unsigned short duration);
 int check_obstacle(void *world, unsigned short x, unsigned short y);
 

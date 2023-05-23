@@ -39,6 +39,20 @@ void init_world(void **world, struct winsize w) {
   *world = b;
 }
 
+void destroy_world(void **world) {
+
+  int i, width;
+  WORLD_t *b = (WORLD_t *)*world;
+  
+  width = b->size_x;
+
+  for (i = 0; i < width; i++) {
+    free(b->world[i]);
+  }
+  free(b->world);
+  free(b);
+}
+
 void update_world(void *world) {
 
   int i, j;

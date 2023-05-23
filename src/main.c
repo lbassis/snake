@@ -22,21 +22,30 @@ int main() {
   init_curses();
   
   w = create_screen();
-  init_world(&world, w);
 
-  draw_menu(w, DRAW);
-  while(getch() == ERR);
-  draw_menu(w, CLEAR);
 
-  draw_screen(w, world);
-  score_position = draw_score(w);
-  init_player(&player, w.ws_col, w.ws_row);
-  create_food(world);
+  while (1) {
 
-  game_loop(player, world, score_position);
-  draw_game_over(w);
+    init_world(&world, w);
+    draw_menu(w, DRAW);
+
+    while(getch() == ERR);
+
+    draw_menu(w, CLEAR);
+    draw_screen(w, world);
+    score_position = draw_score(w);
+    init_player(&player, w.ws_col, w.ws_row);
+    create_food(world);
+
+    game_loop(player, world, score_position);
+
+    destroy_world(&world);
+    destroy_player(&player);
+    draw_game_over(w);
+    
+    while(getch() == ERR);
+  }
   
-  while(1);
   endwin();
   return 0;
 }

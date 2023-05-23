@@ -7,6 +7,7 @@
 int get_size(void *player);
 void debug_player(void *player);
 void init_player(void **player, int width, int height);
+void destroy_player(void **player);
 void *input_control(void *player);
 void move_player(void *player, void *world);
 void print_player(void *player);
