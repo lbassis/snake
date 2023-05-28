@@ -1,6 +1,10 @@
 #define DRAW 0
 #define CLEAR 1
 
+#define GAME_OVER "Game Over"
+#define PRESS_TO_START "Press any key to start"
+#define ESC "Esc to quit"
+
 void init_curses(void);
 struct winsize create_screen(void);
 void draw_screen(struct winsize w, void *world);

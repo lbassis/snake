@@ -9,7 +9,9 @@
 #include <world.h>
 
 #define DELAY 75000
+#define ESC_KEY 27
 
+int while_esc();
 void game_loop(void *player, void *world, int score_position);
 
 int main() {
@@ -20,7 +22,6 @@ int main() {
   struct winsize w;
 
   init_curses();
-  
   w = create_screen();
 
 
@@ -29,7 +30,9 @@ int main() {
     init_world(&world, w);
     draw_menu(w, DRAW);
 
-    while(getch() == ERR);
+    if (while_esc()) {
+      break;
+    }
 
     draw_menu(w, CLEAR);
     draw_screen(w, world);
@@ -42,11 +45,29 @@ int main() {
     destroy_world(&world);
     destroy_player(&player);
     draw_game_over(w);
-    
-    while(getch() == ERR);
+
+    if (while_esc()) {
+      break;
+    }
   }
-  
+
   endwin();
+  return 0;
+}
+
+int while_esc() {
+
+  int char_read;
+
+  do {
+    char_read = getch();
+
+    if (char_read == ESC_KEY) {
+      return 1;
+    }
+
+  }while(char_read == ERR);
+
   return 0;
 }
 

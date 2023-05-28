@@ -8,13 +8,11 @@
 #include <world.h>
 #include <player.h>
 
-#define GAME_OVER "Game Over!"
-#define PRESS_TO_START "Press any key to start"
-
 void init_curses(void) {
   
   initscr();
-  
+
+  set_escdelay(0); /* No delay when pressing esc */
   curs_set(0); /* Hides the cursor */
   clear();
   noecho();
@@ -28,8 +26,6 @@ struct winsize create_screen(void) {
 
   struct winsize w;
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-
-  
 
   return w;
 }
@@ -67,7 +63,8 @@ void draw_menu(struct winsize w, unsigned short mode) {
   int width = w.ws_col;
   int height = w.ws_row;
 
-  int center_width = width/2 - strlen(PRESS_TO_START)/2;
+  int center_start = width/2 - strlen(PRESS_TO_START)/2;
+  int center_esc = width/2 - strlen(ESC)/2;
   int center_height = height/2;
 
   
@@ -76,7 +73,8 @@ void draw_menu(struct winsize w, unsigned short mode) {
   clear();
 
   if (mode == DRAW) {
-    mvaddstr(center_height, center_width, PRESS_TO_START);
+    mvaddstr(center_height, center_start, PRESS_TO_START);
+    mvaddstr(center_height+1, center_esc, ESC);
   }
 
   attroff(A_BOLD);
@@ -88,14 +86,16 @@ void draw_game_over(struct winsize w) {
   int width = w.ws_col;
   int height = w.ws_row;
 
-  int center_width = width/2 - strlen(GAME_OVER)/2;
+  int center_over = width/2 - strlen(GAME_OVER)/2;
+  int center_esc = width/2 - strlen(ESC)/2;
   int center_height = height/2;
 
   
   attron(A_BOLD);
 
   clear();
-  mvaddstr(center_height, center_width, GAME_OVER);
+  mvaddstr(center_height, center_over, GAME_OVER);
+  mvaddstr(center_height+1, center_esc, ESC);
 
   attroff(A_BOLD);
   
