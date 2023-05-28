@@ -4,7 +4,9 @@
 #include <sys/ioctl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
+#include <base.h>
 #include <interface.h>
 #include <world.h>
 
@@ -35,6 +37,9 @@ void init_world(void **world, struct winsize w) {
       b->world[i][j] = EMPTY_CELL;
     }
   }
+
+  /* sets the seed */
+  srand(time(0));
 
   *world = b;
 }
@@ -114,8 +119,8 @@ void create_food(void *world) {
   int width = b->size_x;
   int height = b->size_y;
 
-  int x = random() % width;
-  int y = random() % height;
+  int x = MARGIN_X + 1 + random() % (width - 2*(MARGIN_X+1));
+  int y = MARGIN_Y + 1 + random() % (height - 2*(MARGIN_Y+1));
 
   b->world[x][y] = FOOD_CELL;
   mvaddch(y, x, '*');
