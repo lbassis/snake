@@ -14,6 +14,8 @@ typedef struct {
   unsigned short position_y;
 
   enum Direction direction;
+  enum Input_Ctrl received_input;
+  
   pthread_t control_thread;
   int control_tid;
 } PLAYER_t;
@@ -39,6 +41,7 @@ void init_player(void **player, int width, int height) {
   p->direction = SOUTH;
   p->position_x = (int) width/2 + MARGIN_X;
   p->position_y = (int) height/2 + MARGIN_Y;
+  p->received_input = NO_INPUT;
   p->control_tid = pthread_create(&(p->control_thread), NULL, input_control, p);
   
   *player = p;
@@ -53,27 +56,31 @@ void destroy_player(void **player) {
 }
 
 void *input_control(void *player) {
+
   int ch;
+  PLAYER_t *p = (PLAYER_t *)player;
   
   while (1) {
 
     ch = getch();
 
-    switch (ch) {
-    case KEY_UP:
-      change_direction(player, NORTH);
-      break;
-    case KEY_RIGHT:
-      change_direction(player, WEST);
-      break;
-    case KEY_DOWN:
-      change_direction(player, SOUTH);
-      break;
-    case KEY_LEFT:
-      change_direction(player, EAST);
-      break;
-    default:
-      break;
+    if (p->received_input == NO_INPUT) {
+      switch (ch) {
+      case KEY_UP:
+	change_direction(player, NORTH);
+	break;
+      case KEY_RIGHT:
+	change_direction(player, WEST);
+	break;
+      case KEY_DOWN:
+	change_direction(player, SOUTH);
+	break;
+      case KEY_LEFT:
+	change_direction(player, EAST);
+	break;
+      default:
+	break;
+      }
     }
   }
 }
@@ -101,6 +108,8 @@ void move_player(void *player, void *world) {
   default:
     break;
   }
+
+  p->received_input = NO_INPUT;
 }
 
 void print_player(void *player) {
@@ -117,6 +126,7 @@ void change_direction(void *player, enum Direction dir) {
   
   if (diff != 2) { /* We can't make a 180 */
     p->direction = dir;
+    p->received_input = RECEIVED; 
   }
 }
 

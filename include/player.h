@@ -4,6 +4,11 @@
 
 #define INITIAL_SIZE 3
 
+enum Input_Ctrl {
+  RECEIVED,
+  NO_INPUT
+};
+
 int get_size(void *player);
 void debug_player(void *player);
 void init_player(void **player, int width, int height);
